@@ -1,0 +1,11 @@
+# dependencies
+node_modules/
+# build outputs
+dist/
+client/dist/
+server/dist/
+# env / secrets
+.env
+.env.*
+# macOS
+.DS_Store
