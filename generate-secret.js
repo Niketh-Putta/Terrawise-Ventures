@@ -2,7 +2,8 @@
 // Quick script to generate a secure SESSION_SECRET
 // Usage: node generate-secret.js
 
-const crypto = require('crypto');
+import crypto from 'crypto';
+
 const secret = crypto.randomBytes(32).toString('hex');
 console.log('\n🔐 Generated SESSION_SECRET:');
 console.log(secret);
