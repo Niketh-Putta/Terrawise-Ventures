@@ -80,9 +80,14 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
-    // Start email monitoring service
-    emailService.startMonitoring().catch((err) => {
-      console.error('Failed to start email monitoring:', err);
-    });
+    // Start email monitoring service (only in non-serverless environments)
+    // Vercel serverless functions don't support long-running processes
+    if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      emailService.startMonitoring().catch((err) => {
+        console.error('Failed to start email monitoring:', err);
+      });
+    } else {
+      console.log('Email monitoring skipped in serverless environment');
+    }
   });
 })();
