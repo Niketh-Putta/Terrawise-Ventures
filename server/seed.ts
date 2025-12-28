@@ -1,9 +1,10 @@
-import { db } from "./db";
+import { getDb } from "./db";
 import { projects, testimonials, inquiries, marketingAgents } from "../shared/schema";
 
 async function seedDatabase() {
   try {
     console.log("🌱 Seeding database...");
+    const db = getDb();
 
     // Check if data already exists
     const existingProjects = await db.select().from(projects).limit(1);

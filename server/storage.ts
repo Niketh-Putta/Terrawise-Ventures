@@ -31,7 +31,7 @@ import {
   type Email,
   type InsertEmail,
 } from "@shared/schema";
-import { db } from "./db";
+import { getDb } from "./db";
 import { eq, or, ilike, sql, and } from "drizzle-orm";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -91,17 +91,37 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  private db = getDb();
+  private fallback: MemStorage | null = null;
+
+  private getFallbackStorage() {
+    if (!this.fallback) {
+      this.fallback = new MemStorage();
+    }
+    return this.fallback;
+  }
+
   async getProjects(): Promise<Project[]> {
-    return await db.select().from(projects);
+    try {
+      return await this.db.select().from(projects);
+    } catch (error) {
+      console.error("Failed to fetch projects from database, using fallback data.", error);
+      return this.getFallbackStorage().getProjects();
+    }
   }
 
   async getProjectById(id: number): Promise<Project | undefined> {
-    const [project] = await db.select().from(projects).where(eq(projects.id, id));
-    return project || undefined;
+    try {
+      const [project] = await this.db.select().from(projects).where(eq(projects.id, id));
+      return project || undefined;
+    } catch (error) {
+      console.error("Failed to fetch project from database, using fallback data.", error);
+      return this.getFallbackStorage().getProjectById(id);
+    }
   }
 
   async createProject(insertProject: InsertProject): Promise<Project> {
-    const [project] = await db
+    const [project] = await this.db
       .insert(projects)
       .values(insertProject)
       .returning();
@@ -111,7 +131,7 @@ export class DatabaseStorage implements IStorage {
   async createMarketingAgent(agent: InsertMarketingAgent): Promise<MarketingAgent> {
     // Hash the password before storing
     const hashedPassword = await this.hashPassword(agent.password);
-    const [marketingAgent] = await db
+    const [marketingAgent] = await this.db
       .insert(marketingAgents)
       .values({
         ...agent,
@@ -122,7 +142,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async authenticateAgent(phone: string, password: string): Promise<MarketingAgent | null> {
-    const [agent] = await db
+    const [agent] = await this.db
       .select()
       .from(marketingAgents)
       .where(eq(marketingAgents.phone, phone));
@@ -136,21 +156,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMarketingAgents(): Promise<MarketingAgent[]> {
-    return await db.select().from(marketingAgents);
+    return await this.db.select().from(marketingAgents);
   }
 
   async getMarketingAgentById(id: number): Promise<MarketingAgent | undefined> {
-    const [agent] = await db.select().from(marketingAgents).where(eq(marketingAgents.id, id));
+    const [agent] = await this.db.select().from(marketingAgents).where(eq(marketingAgents.id, id));
     return agent || undefined;
   }
 
   async getMarketingAgentByPhone(phone: string): Promise<MarketingAgent | undefined> {
-    const [agent] = await db.select().from(marketingAgents).where(eq(marketingAgents.phone, phone));
+    const [agent] = await this.db.select().from(marketingAgents).where(eq(marketingAgents.phone, phone));
     return agent || undefined;
   }
 
   async updateMarketingAgentStatus(id: number, status: string): Promise<MarketingAgent> {
-    const [agent] = await db
+    const [agent] = await this.db
       .update(marketingAgents)
       .set({ status })
       .where(eq(marketingAgents.id, id))
@@ -159,7 +179,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createInquiry(insertInquiry: InsertInquiry): Promise<Inquiry> {
-    const [inquiry] = await db
+    const [inquiry] = await this.db
       .insert(inquiries)
       .values({
         ...insertInquiry,
@@ -171,7 +191,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getInquiries(): Promise<Inquiry[]> {
-    return await db.select().from(inquiries);
+    return await this.db.select().from(inquiries);
   }
 
   async getInquiriesByMarketingAgent(agentId: number): Promise<InquiryWithProject[]> {
@@ -179,7 +199,7 @@ export class DatabaseStorage implements IStorage {
     const agent = await this.getMarketingAgentById(agentId);
     const agentName = agent?.fullName;
 
-    return await db
+    return await this.db
       .select({
         id: inquiries.id,
         fullName: inquiries.fullName,
@@ -211,7 +231,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateInquiryStatus(id: number, status: string): Promise<Inquiry> {
-    const [inquiry] = await db
+    const [inquiry] = await this.db
       .update(inquiries)
       .set({ leadStatus: status })
       .where(eq(inquiries.id, id))
@@ -220,7 +240,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addAgentComment(inquiryId: number, comment: string): Promise<Inquiry> {
-    const [inquiry] = await db
+    const [inquiry] = await this.db
       .update(inquiries)
       .set({ 
         agentComment: comment,
@@ -232,11 +252,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTestimonials(): Promise<Testimonial[]> {
-    return await db.select().from(testimonials);
+    return await this.db.select().from(testimonials);
   }
 
   async createTestimonial(insertTestimonial: InsertTestimonial): Promise<Testimonial> {
-    const [testimonial] = await db
+    const [testimonial] = await this.db
       .insert(testimonials)
       .values(insertTestimonial)
       .returning();
@@ -259,7 +279,7 @@ export class DatabaseStorage implements IStorage {
 
   async createAdminUser(userData: InsertAdminUser): Promise<AdminUser> {
     const passwordHash = await this.hashPassword(userData.password);
-    const [user] = await db
+    const [user] = await this.db
       .insert(adminUsers)
       .values({
         email: userData.email,
@@ -271,7 +291,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAdminUserByEmail(email: string): Promise<AdminUser | undefined> {
-    const [user] = await db
+    const [user] = await this.db
       .select()
       .from(adminUsers)
       .where(eq(adminUsers.email, email));
@@ -295,9 +315,9 @@ export class DatabaseStorage implements IStorage {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     
     // Clean up old OTP sessions for this phone
-    await db.delete(otpSessions).where(eq(otpSessions.phone, phone));
+    await this.db.delete(otpSessions).where(eq(otpSessions.phone, phone));
     
-    const [otpSession] = await db
+    const [otpSession] = await this.db
       .insert(otpSessions)
       .values({
         phone,
@@ -314,7 +334,7 @@ export class DatabaseStorage implements IStorage {
 
   async verifyOtpSession(phone: string, otp: string): Promise<MarketingAgent | null> {
     // Find valid OTP session
-    const [otpSession] = await db
+    const [otpSession] = await this.db
       .select()
       .from(otpSessions)
       .where(
@@ -331,7 +351,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     // Mark OTP as verified
-    await db
+    await this.db
       .update(otpSessions)
       .set({ verified: true })
       .where(eq(otpSessions.id, otpSession.id));
@@ -342,12 +362,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async cleanupExpiredOtpSessions(): Promise<void> {
-    await db.delete(otpSessions).where(sql`${otpSessions.expiresAt} <= NOW()`);
+    await this.db.delete(otpSessions).where(sql`${otpSessions.expiresAt} <= NOW()`);
   }
 
   // New Enquiry Types Implementation
   async createSiteVisitEnquiry(enquiry: InsertSiteVisitEnquiry): Promise<SiteVisitEnquiry> {
-    const [siteVisitEnquiry] = await db
+    const [siteVisitEnquiry] = await this.db
       .insert(siteVisitEnquiries)
       .values({
         ...enquiry,
@@ -363,11 +383,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSiteVisitEnquiries(): Promise<SiteVisitEnquiry[]> {
-    return await db.select().from(siteVisitEnquiries).orderBy(sql`created_at DESC`);
+    return await this.db.select().from(siteVisitEnquiries).orderBy(sql`created_at DESC`);
   }
 
   async createConstructionServiceEnquiry(enquiry: InsertConstructionServiceEnquiry): Promise<ConstructionServiceEnquiry> {
-    const [constructionEnquiry] = await db
+    const [constructionEnquiry] = await this.db
       .insert(constructionServiceEnquiries)
       .values({
         ...enquiry,
@@ -381,11 +401,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getConstructionServiceEnquiries(): Promise<ConstructionServiceEnquiry[]> {
-    return await db.select().from(constructionServiceEnquiries).orderBy(sql`created_at DESC`);
+    return await this.db.select().from(constructionServiceEnquiries).orderBy(sql`created_at DESC`);
   }
 
   async createGeneralEnquiry(enquiry: InsertGeneralEnquiry): Promise<GeneralEnquiry> {
-    const [generalEnquiry] = await db
+    const [generalEnquiry] = await this.db
       .insert(generalEnquiries)
       .values({
         ...enquiry,
@@ -396,12 +416,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getGeneralEnquiries(): Promise<GeneralEnquiry[]> {
-    return await db.select().from(generalEnquiries).orderBy(sql`created_at DESC`);
+    return await this.db.select().from(generalEnquiries).orderBy(sql`created_at DESC`);
   }
 
   // Email methods
   async createEmail(emailData: InsertEmail): Promise<Email> {
-    const [email] = await db
+    const [email] = await this.db
       .insert(emails)
       .values({
         ...emailData,
@@ -415,15 +435,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getEmails(): Promise<Email[]> {
-    return await db.select().from(emails).orderBy(sql`received_at DESC`);
+    return await this.db.select().from(emails).orderBy(sql`received_at DESC`);
   }
 
   async getUnreadEmails(): Promise<Email[]> {
-    return await db.select().from(emails).where(eq(emails.isRead, false)).orderBy(sql`received_at DESC`);
+    return await this.db.select().from(emails).where(eq(emails.isRead, false)).orderBy(sql`received_at DESC`);
   }
 
   async markEmailAsRead(id: number): Promise<Email> {
-    const [email] = await db
+    const [email] = await this.db
       .update(emails)
       .set({ isRead: true })
       .where(eq(emails.id, id))
@@ -432,7 +452,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getEmailById(id: number): Promise<Email | undefined> {
-    const [email] = await db.select().from(emails).where(eq(emails.id, id));
+    const [email] = await this.db.select().from(emails).where(eq(emails.id, id));
     return email || undefined;
   }
 }
@@ -903,5 +923,18 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Using DatabaseStorage for production with PostgreSQL
-export const storage = new DatabaseStorage();
+const createStorage = (): IStorage => {
+  if (!process.env.DATABASE_URL) {
+    console.warn("DATABASE_URL not set, using in-memory storage.");
+    return new MemStorage();
+  }
+
+  try {
+    return new DatabaseStorage();
+  } catch (error) {
+    console.error("Failed to initialize database storage, falling back to in-memory storage.", error);
+    return new MemStorage();
+  }
+};
+
+export const storage = createStorage();
