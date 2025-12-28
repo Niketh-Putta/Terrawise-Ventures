@@ -659,6 +659,7 @@ export class MemStorage implements IStorage {
     const inquiry: Inquiry = { 
       ...insertInquiry, 
       id, 
+      email: insertInquiry.email ?? null,
       projectId: insertInquiry.projectId || null,
       budget: insertInquiry.budget || null,
       message: insertInquiry.message || null,
@@ -678,6 +679,9 @@ export class MemStorage implements IStorage {
     const marketingAgent: MarketingAgent = {
       ...agent,
       id,
+      email: agent.email ?? null,
+      address: agent.address ?? null,
+      experience: agent.experience ?? null,
       status: "approved", // Auto-approve all new agents
       createdAt: new Date(),
     };
@@ -864,6 +868,12 @@ export class MemStorage implements IStorage {
     const siteVisitEnquiry: SiteVisitEnquiry = {
       ...enquiry,
       id,
+      email: enquiry.email ?? null,
+      projectId: enquiry.projectId ?? null,
+      projectName: enquiry.projectName ?? null,
+      marketingAgentName: enquiry.marketingAgentName ?? null,
+      message: enquiry.message ?? null,
+      purpose: enquiry.purpose ?? null,
       createdAt: new Date(),
     };
     return siteVisitEnquiry;
@@ -878,6 +888,10 @@ export class MemStorage implements IStorage {
     const constructionEnquiry: ConstructionServiceEnquiry = {
       ...enquiry,
       id,
+      email: enquiry.email ?? null,
+      projectDetails: enquiry.projectDetails ?? null,
+      budget: enquiry.budget ?? null,
+      timeline: enquiry.timeline ?? null,
       createdAt: new Date(),
     };
     return constructionEnquiry;
@@ -892,6 +906,7 @@ export class MemStorage implements IStorage {
     const generalEnquiry: GeneralEnquiry = {
       ...enquiry,
       id,
+      purpose: enquiry.purpose ?? null,
       createdAt: new Date(),
     };
     return generalEnquiry;

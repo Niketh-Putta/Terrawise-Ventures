@@ -158,11 +158,11 @@ export const insertInquirySchema = createInsertSchema(inquiries).omit({
   id: true,
   createdAt: true,
   leadStatus: true,
-  budget: true,
 }).extend({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   email: z.string().email("Please enter a valid email address").optional().or(z.literal("")),
+  budget: z.string().optional(),
 });
 
 export const insertTestimonialSchema = createInsertSchema(testimonials).omit({
