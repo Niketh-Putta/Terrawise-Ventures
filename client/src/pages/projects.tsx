@@ -40,10 +40,17 @@ export default function Projects() {
     { value: "location", label: "Location" },
   ];
 
+  const normalizeStatus = (status: string) => {
+    if (status === "ready" || status === "under-development") {
+      return "ongoing";
+    }
+    return status;
+  };
+
   // Filter and sort projects
   const filteredAndSortedProjects = projects
     .filter(project => {
-      const matchesFilter = project.status === activeFilter;
+      const matchesFilter = normalizeStatus(project.status) === activeFilter;
       const matchesSearch = 
         project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         project.location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -65,12 +72,13 @@ export default function Projects() {
     });
 
   const getStatusBadge = (status: string) => {
+    const normalizedStatus = normalizeStatus(status);
     const statusMap = {
       "upcoming": { label: "Upcoming", variant: "outline" as const, className: "border-blue-500 text-blue-700 bg-blue-50" },
       "ongoing": { label: "Ongoing", variant: "secondary" as const, className: "bg-orange-100 text-orange-800 border-orange-200" },
       "completed": { label: "Completed", variant: "default" as const, className: "bg-green-100 text-green-800 border-green-200" },
     };
-    return statusMap[status as keyof typeof statusMap] || { label: status, variant: "outline" as const, className: "border-gray-500 text-gray-700 bg-gray-50" };
+    return statusMap[normalizedStatus as keyof typeof statusMap] || { label: status, variant: "outline" as const, className: "border-gray-500 text-gray-700 bg-gray-50" };
   };
 
   if (isLoading) {
@@ -194,6 +202,7 @@ export default function Projects() {
         ) : (
           <div className="flex flex-wrap justify-center gap-8">
             {filteredAndSortedProjects.map((project) => {
+              const normalizedStatus = normalizeStatus(project.status);
               const statusBadge = getStatusBadge(project.status);
               return (
                 <Card key={project.id} className="overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full max-w-sm">
@@ -217,7 +226,7 @@ export default function Projects() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-xl font-bold text-gray-900">{project.name}</h3>
-                      {project.status !== "upcoming" && (
+                      {normalizedStatus !== "upcoming" && (
                         <div className="text-right">
                           <div className="text-lg font-bold text-primary">{project.price}</div>
                           <div className="text-sm text-muted-foreground">Starting Price</div>
@@ -235,7 +244,7 @@ export default function Projects() {
                     </p>
                     
                     {/* Plot Info - Only for non-upcoming projects */}
-                    {project.status !== "upcoming" && (
+                    {normalizedStatus !== "upcoming" && (
                       <div className="grid grid-cols-2 gap-4 mb-6">
                         <div className="text-center p-3 bg-muted rounded-lg">
                           <div className="font-semibold text-gray-900">{project.plotsAvailable}</div>
