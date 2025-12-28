@@ -83,3 +83,4 @@ The `SESSION_SECRET` is used to encrypt session cookies for your Express app. It
 
 **Never use the default secret in production!**
 
+

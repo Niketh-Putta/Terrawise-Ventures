@@ -52,3 +52,4 @@ Make sure to set the following environment variables in your Vercel project sett
 - Check Vercel function logs for runtime errors
 - Verify that the build output directory exists after build
 
+

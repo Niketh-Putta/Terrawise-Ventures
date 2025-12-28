@@ -1054,15 +1054,21 @@ async function setupVite(app2, server) {
   });
 }
 function serveStatic(app2) {
-  const distPath = path2.resolve(import.meta.dirname, "public");
+  const distPath = process.env.VERCEL ? path2.resolve(process.cwd(), "dist", "public") : path2.resolve(import.meta.dirname, "..", "dist", "public");
   if (!fs.existsSync(distPath)) {
-    throw new Error(
+    console.warn(
       `Could not find the build directory: ${distPath}, make sure to build the client first`
     );
+    return;
   }
   app2.use(express.static(distPath));
   app2.use("*", (_req, res) => {
-    res.sendFile(path2.resolve(distPath, "index.html"));
+    const indexPath = path2.resolve(distPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).json({ message: "Not found" });
+    }
   });
 }
 
@@ -1326,8 +1332,12 @@ app.use((req, res, next) => {
     reusePort: true
   }, () => {
     log(`serving on port ${port}`);
-    emailService.startMonitoring().catch((err) => {
-      console.error("Failed to start email monitoring:", err);
-    });
+    if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      emailService.startMonitoring().catch((err) => {
+        console.error("Failed to start email monitoring:", err);
+      });
+    } else {
+      console.log("Email monitoring skipped in serverless environment");
+    }
   });
 })();

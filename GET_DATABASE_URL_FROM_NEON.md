@@ -83,3 +83,4 @@ The `&channel_binding=require` parameter can cause issues with serverless enviro
 
 🎯 **Action: Click "Show password", copy the connection string, remove `&channel_binding=require`, and add to Vercel!**
 
+
