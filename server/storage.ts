@@ -101,23 +101,32 @@ export class DatabaseStorage implements IStorage {
     return this.fallback;
   }
 
-  async getProjects(): Promise<Project[]> {
+  private async withFallback<T>(action: () => Promise<T>, fallback: () => Promise<T>, message: string) {
     try {
-      return await this.db.select().from(projects);
+      return await action();
     } catch (error) {
-      console.error("Failed to fetch projects from database, using fallback data.", error);
-      return this.getFallbackStorage().getProjects();
+      console.error(message, error);
+      return fallback();
     }
   }
 
+  async getProjects(): Promise<Project[]> {
+    return this.withFallback(
+      () => this.db.select().from(projects),
+      () => this.getFallbackStorage().getProjects(),
+      "Failed to fetch projects from database, using fallback data.",
+    );
+  }
+
   async getProjectById(id: number): Promise<Project | undefined> {
-    try {
-      const [project] = await this.db.select().from(projects).where(eq(projects.id, id));
-      return project || undefined;
-    } catch (error) {
-      console.error("Failed to fetch project from database, using fallback data.", error);
-      return this.getFallbackStorage().getProjectById(id);
-    }
+    return this.withFallback(
+      async () => {
+        const [project] = await this.db.select().from(projects).where(eq(projects.id, id));
+        return project || undefined;
+      },
+      () => this.getFallbackStorage().getProjectById(id),
+      "Failed to fetch project from database, using fallback data.",
+    );
   }
 
   async createProject(insertProject: InsertProject): Promise<Project> {
@@ -252,7 +261,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTestimonials(): Promise<Testimonial[]> {
-    return await this.db.select().from(testimonials);
+    return this.withFallback(
+      () => this.db.select().from(testimonials),
+      () => this.getFallbackStorage().getTestimonials(),
+      "Failed to fetch testimonials from database, using fallback data.",
+    );
   }
 
   async createTestimonial(insertTestimonial: InsertTestimonial): Promise<Testimonial> {

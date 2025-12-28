@@ -123,3 +123,4 @@ postgresql://neondb_owner:npg_abc123xyz@ep-cool-darkness-123456.us-east-2.aws.ne
 - 💬 **Neon Support**: Available in dashboard
 
 
+
