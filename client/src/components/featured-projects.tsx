@@ -87,9 +87,7 @@ export default function FeaturedProjects() {
               <Card key={project.id} className="overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full max-w-sm">
                 <div className="relative h-64">
                   <img 
-                    src={project.name === "TerraBloom" ? "/images/terrabloom-hero.jpg" : 
-                         project.name === "TerraGrid" ? "/images/terragrid-hero.jpg" : 
-                         project.imageUrl} 
+                    src={project.imageUrl} 
                     alt={project.name}
                     className="w-full h-full object-cover"
                   />

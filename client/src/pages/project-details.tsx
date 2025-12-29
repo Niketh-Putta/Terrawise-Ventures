@@ -261,9 +261,7 @@ export default function ProjectDetails() {
                 <CardContent className="p-0">
                   <div className="relative">
                     <img 
-                      src={project.name === "TerraBloom" ? "/images/terrabloom-hero.jpg" : 
-                           project.name === "TerraGrid" ? "/images/terragrid-hero.jpg" : 
-                           projectImages[0]}
+                      src={projectImages[0]}
                       alt={`${project.name} - Coming Soon`}
                       className="w-full h-96 object-cover rounded-t-lg"
                     />
