@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage, MemStorage } from "./storage";
+import { storage } from "./storage";
 import { 
   insertInquirySchema, 
   insertMarketingAgentSchema, 
@@ -13,21 +13,14 @@ import {
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  const fallbackStorage = new MemStorage();
-
   // Get all projects
   app.get("/api/projects", async (req, res) => {
     try {
       const projects = await storage.getProjects();
-      if (projects.length === 0) {
-        const fallbackProjects = await fallbackStorage.getProjects();
-        return res.json(fallbackProjects);
-      }
       res.json(projects);
     } catch (error) {
-      console.error("Failed to fetch projects, serving fallback data.", error);
-      const fallbackProjects = await fallbackStorage.getProjects();
-      res.json(fallbackProjects);
+      console.error("Failed to fetch projects.", error);
+      res.status(500).json({ message: "Failed to fetch projects" });
     }
   });
 
@@ -41,22 +34,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const project = await storage.getProjectById(id);
       if (!project) {
-        const fallbackProject = await fallbackStorage.getProjectById(id);
-        if (!fallbackProject) {
-          return res.status(404).json({ message: "Project not found" });
-        }
-        return res.json(fallbackProject);
+        return res.status(404).json({ message: "Project not found" });
       }
       
       res.json(project);
     } catch (error) {
-      console.error("Failed to fetch project, serving fallback data.", error);
-      const fallbackProject = await fallbackStorage.getProjectById(parseInt(req.params.id));
-      if (!fallbackProject) {
-        return res.status(404).json({ message: "Project not found" });
-      }
-      
-      res.json(fallbackProject);
+      console.error("Failed to fetch project.", error);
+      res.status(500).json({ message: "Failed to fetch project" });
     }
   });
 
@@ -189,15 +173,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/testimonials", async (req, res) => {
     try {
       const testimonials = await storage.getTestimonials();
-      if (testimonials.length === 0) {
-        const fallbackTestimonials = await fallbackStorage.getTestimonials();
-        return res.json(fallbackTestimonials);
-      }
       res.json(testimonials);
     } catch (error) {
-      console.error("Failed to fetch testimonials, serving fallback data.", error);
-      const fallbackTestimonials = await fallbackStorage.getTestimonials();
-      res.json(fallbackTestimonials);
+      console.error("Failed to fetch testimonials.", error);
+      res.status(500).json({ message: "Failed to fetch testimonials" });
     }
   });
 

@@ -91,42 +91,17 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  private db = getDb();
-  private fallback: MemStorage | null = null;
-
-  private getFallbackStorage() {
-    if (!this.fallback) {
-      this.fallback = new MemStorage();
-    }
-    return this.fallback;
-  }
-
-  private async withFallback<T>(action: () => Promise<T>, fallback: () => Promise<T>, message: string) {
-    try {
-      return await action();
-    } catch (error) {
-      console.error(message, error);
-      return fallback();
-    }
+  private get db() {
+    return getDb();
   }
 
   async getProjects(): Promise<Project[]> {
-    return this.withFallback(
-      () => this.db.select().from(projects),
-      () => this.getFallbackStorage().getProjects(),
-      "Failed to fetch projects from database, using fallback data.",
-    );
+    return await this.db.select().from(projects);
   }
 
   async getProjectById(id: number): Promise<Project | undefined> {
-    return this.withFallback(
-      async () => {
-        const [project] = await this.db.select().from(projects).where(eq(projects.id, id));
-        return project || undefined;
-      },
-      () => this.getFallbackStorage().getProjectById(id),
-      "Failed to fetch project from database, using fallback data.",
-    );
+    const [project] = await this.db.select().from(projects).where(eq(projects.id, id));
+    return project || undefined;
   }
 
   async createProject(insertProject: InsertProject): Promise<Project> {
@@ -261,11 +236,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTestimonials(): Promise<Testimonial[]> {
-    return this.withFallback(
-      () => this.db.select().from(testimonials),
-      () => this.getFallbackStorage().getTestimonials(),
-      "Failed to fetch testimonials from database, using fallback data.",
-    );
+    return await this.db.select().from(testimonials);
   }
 
   async createTestimonial(insertTestimonial: InsertTestimonial): Promise<Testimonial> {
@@ -952,17 +923,19 @@ export class MemStorage implements IStorage {
 }
 
 const createStorage = (): IStorage => {
+  const isProduction = process.env.NODE_ENV === "production";
+
   if (!process.env.DATABASE_URL) {
+    if (isProduction) {
+      console.error("DATABASE_URL not set in production; API calls will fail.");
+      return new DatabaseStorage();
+    }
+
     console.warn("DATABASE_URL not set, using in-memory storage.");
     return new MemStorage();
   }
 
-  try {
-    return new DatabaseStorage();
-  } catch (error) {
-    console.error("Failed to initialize database storage, falling back to in-memory storage.", error);
-    return new MemStorage();
-  }
+  return new DatabaseStorage();
 };
 
 export const storage = createStorage();
