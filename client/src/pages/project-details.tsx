@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry, type Project } from "@shared/schema";
+import { getFallbackProject } from "@/data/fallback-data";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -87,9 +88,17 @@ export default function ProjectDetails() {
   const { data: project, isLoading } = useQuery<Project>({
     queryKey: ["/api/projects", id],
     queryFn: async () => {
-      const response = await fetch(`/api/projects/${id}`);
-      if (!response.ok) throw new Error("Project not found");
-      return response.json();
+      try {
+        const response = await fetch(`/api/projects/${id}`);
+        if (!response.ok) throw new Error("Project not found");
+        return response.json();
+      } catch (error) {
+        const fallbackProject = getFallbackProject(Number(id));
+        if (fallbackProject) {
+          return fallbackProject;
+        }
+        throw error;
+      }
     },
   });
 

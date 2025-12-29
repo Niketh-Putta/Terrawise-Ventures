@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { fallbackProjects, fallbackTestimonials, getFallbackProject } from "@/data/fallback-data";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -35,16 +36,36 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
-      credentials: "include",
-    });
+    const url = queryKey.join("/") as string;
+    try {
+      const res = await fetch(url, {
+        credentials: "include",
+      });
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      return await res.json();
+    } catch (error) {
+      if (url.startsWith("/api/projects")) {
+        if (queryKey.length > 1) {
+          const id = Number(queryKey[1]);
+          const fallbackProject = Number.isFinite(id) ? getFallbackProject(id) : undefined;
+          if (fallbackProject) {
+            return fallbackProject as T;
+          }
+        }
+        return fallbackProjects as T;
+      }
+
+      if (url.startsWith("/api/testimonials")) {
+        return fallbackTestimonials as T;
+      }
+
+      throw error;
     }
-
-    await throwIfResNotOk(res);
-    return await res.json();
   };
 
 export const queryClient = new QueryClient({
