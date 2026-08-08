@@ -78,7 +78,11 @@ export default function ContactSection() {
       icon: MapPin,
       title: "Office Visit",
       description: "Visit our experience center",
-      details: ["H.No: 200, 2nd floor, 2nd main Belathur", "Sri Nivas Residency"],
+      details: [
+        "PropertyPath LTD D.No: F1 & F2, Sarovi #72, 1st Floor",
+        "Sunshine Paradise Layout Kurudusonnenahalli,",
+        "Virgonagar Post Bangalore – 560049",
+      ],
       availability: "",
       bgColor: "bg-secondary/10",
       iconColor: "text-secondary",
