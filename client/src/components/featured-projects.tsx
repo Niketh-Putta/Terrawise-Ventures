@@ -79,7 +79,7 @@ export default function FeaturedProjects() {
                 <img
                   src={vanamProject.imageUrl}
                   alt="Vanam premium plotted development"
-                  className="absolute inset-0 h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/40 to-transparent lg:hidden" />
               </div>
