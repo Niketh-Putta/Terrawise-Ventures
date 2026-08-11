@@ -40,16 +40,16 @@ export default function FloatingActions() {
       icon: MessageSquare,
       bgColor: "bg-green-500 hover:bg-green-600",
       action: () => {
-        // WhatsApp action
-        window.open("https://wa.me/919876543210", "_blank");
+        // WhatsApp action — primary contact number
+        window.open("https://wa.me/916364467941", "_blank");
       },
     },
     {
       icon: Phone,
       bgColor: "bg-primary hover:bg-primary/90",
       action: () => {
-        // Phone action
-        window.location.href = "tel:+919876543210";
+        // Phone action — primary contact number
+        window.location.href = "tel:+916364467941";
       },
     },
     {

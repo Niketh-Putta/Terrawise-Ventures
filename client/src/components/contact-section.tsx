@@ -69,7 +69,7 @@ export default function ContactSection() {
       icon: Phone,
       title: "Phone Consultation",
       description: "Speak directly with our property experts",
-      details: ["+91 98765 43210", "+91 98765 43211"],
+      details: ["+91 6364467941", "+91 63644 67942"],
       availability: "Available: Mon-Sat, 9 AM - 7 PM",
       bgColor: "bg-primary/10",
       iconColor: "text-primary",
@@ -100,7 +100,7 @@ export default function ContactSection() {
       icon: MessageSquare,
       title: "WhatsApp Support",
       description: "Quick responses and plot updates",
-      details: ["+91 98765 43210"],
+      details: ["+91 6364467941"],
       availability: "",
       bgColor: "bg-muted",
       iconColor: "text-muted-foreground",
@@ -147,7 +147,11 @@ export default function ContactSection() {
                             </div>
                           )}
                           {method.title === "WhatsApp Support" && (
-                            <Button size="sm" className="mt-2 bg-green-500 hover:bg-green-600">
+                            <Button
+                              size="sm"
+                              className="mt-2 bg-green-500 hover:bg-green-600"
+                              onClick={() => window.open("https://wa.me/916364467941", "_blank")}
+                            >
                               <MessageSquare className="mr-2 h-4 w-4" />
                               Start Chat
                             </Button>
