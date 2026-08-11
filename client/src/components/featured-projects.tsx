@@ -75,7 +75,7 @@ export default function FeaturedProjects() {
         {vanamProject && (
           <div className="mb-12 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-stone-900 text-white shadow-xl">
             <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="relative min-h-[280px]">
+              <div className="relative min-h-[380px] lg:min-h-[460px]">
                 <img
                   src={vanamProject.imageUrl}
                   alt="Vanam premium plotted development"
@@ -83,7 +83,7 @@ export default function FeaturedProjects() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/40 to-transparent lg:hidden" />
               </div>
-              <div className="flex flex-col justify-center p-8 lg:p-10">
+              <div className="flex flex-col justify-center p-8 lg:p-12">
                 <Badge className="mb-4 w-fit border-amber-300/40 bg-amber-400/20 text-amber-100 hover:bg-amber-400/30">
                   Latest Offering
                 </Badge>
