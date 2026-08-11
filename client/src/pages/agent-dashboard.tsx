@@ -14,6 +14,7 @@ import { UserCheck, Phone, Building2, Mail, Calendar, TrendingUp, Users, Eye, Me
 import { agentLoginSchema, type MarketingAgent, type InquiryWithProject } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { PRIMARY_PHONE } from "@/lib/contact";
 
 export default function AgentDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -111,7 +112,7 @@ export default function AgentDashboard() {
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="+91 98765 43210" 
+                            placeholder={PRIMARY_PHONE.display} 
                             {...field} 
                           />
                         </FormControl>

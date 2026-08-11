@@ -38,6 +38,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { downloadProjectBrochure, projectBrochures } from "@/lib/brochures";
+import { CONTACT_PHONES, PRIMARY_PHONE, openWhatsApp } from "@/lib/contact";
 import { SiteVisitPopup } from "@/components/site-visit-popup";
 
 export default function ProjectDetails() {
@@ -588,11 +589,26 @@ export default function ProjectDetails() {
                   <Calendar className="mr-2 h-4 w-4" />
                   Schedule Site Visit
                 </Button>
-                <Button variant="outline" className="w-full">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Call Now: +91 98765 43210
-                </Button>
-                <Button variant="outline" className="w-full bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
+                <div className="space-y-2 rounded-md border px-3 py-3">
+                  <div className="flex items-center text-sm font-medium text-gray-900">
+                    <Phone className="mr-2 h-4 w-4" />
+                    Call Now
+                  </div>
+                  {CONTACT_PHONES.map((phone) => (
+                    <a
+                      key={phone.tel}
+                      href={`tel:${phone.tel}`}
+                      className="block text-sm font-semibold text-primary hover:underline"
+                    >
+                      {phone.display}
+                    </a>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  className="w-full bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                  onClick={openWhatsApp}
+                >
                   <MessageSquare className="mr-2 h-4 w-4" />
                   WhatsApp Inquiry
                 </Button>
@@ -648,7 +664,7 @@ export default function ProjectDetails() {
                           <FormItem>
                             <FormLabel>Phone Number *</FormLabel>
                             <FormControl>
-                              <Input placeholder="+91 98765 43210" {...field} />
+                              <Input placeholder={PRIMARY_PHONE.display} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { X, Calendar, User, Phone, MessageSquare, Mail, Building2 } from "lucide-react";
+import { PRIMARY_PHONE } from "@/lib/contact";
 import { useToast } from "@/hooks/use-toast";
 
 interface SiteVisitPopupProps {
@@ -124,7 +125,7 @@ export function SiteVisitPopup({ isOpen, onClose, projectName }: SiteVisitPopupP
                     <FormItem>
                       <FormLabel>Phone Number *</FormLabel>
                       <FormControl>
-                        <Input placeholder="+91 98765 43210" {...field} />
+                        <Input placeholder={PRIMARY_PHONE.display} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -13,6 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Shield, Banknote, FileText, ArrowLeft, Home } from "lucide-react";
 import { Link } from "wouter";
+import { PRIMARY_PHONE } from "@/lib/contact";
 
 export default function AgentRegister() {
   const { toast } = useToast();
@@ -184,7 +185,7 @@ export default function AgentRegister() {
                         <FormItem>
                           <FormLabel>Phone Number *</FormLabel>
                           <FormControl>
-                            <Input placeholder="+91 98765 43210" {...field} />
+                            <Input placeholder={PRIMARY_PHONE.display} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

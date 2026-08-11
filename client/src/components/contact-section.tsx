@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Phone, MapPin, Mail, MessageSquare, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { CONTACT_PHONES, CONTACT_PHONE_DISPLAYS, PRIMARY_PHONE, openWhatsApp } from "@/lib/contact";
 
 export default function ContactSection() {
   const { toast } = useToast();
@@ -69,7 +70,7 @@ export default function ContactSection() {
       icon: Phone,
       title: "Phone Consultation",
       description: "Speak directly with our property experts",
-      details: ["+91 6364467941", "+91 63644 67942"],
+      details: [...CONTACT_PHONE_DISPLAYS],
       availability: "Available: Mon-Sat, 9 AM - 7 PM",
       bgColor: "bg-primary/10",
       iconColor: "text-primary",
@@ -100,7 +101,7 @@ export default function ContactSection() {
       icon: MessageSquare,
       title: "WhatsApp Support",
       description: "Quick responses and plot updates",
-      details: ["+91 6364467941"],
+      details: [PRIMARY_PHONE.display],
       availability: "",
       bgColor: "bg-muted",
       iconColor: "text-muted-foreground",
@@ -135,11 +136,26 @@ export default function ContactSection() {
                           <h4 className="font-bold text-gray-900 mb-2">{method.title}</h4>
                           <p className="text-muted-foreground mb-2">{method.description}</p>
                           <div className="space-y-1">
-                            {method.details.map((detail, idx) => (
-                              <div key={idx} className={`font-semibold ${method.iconColor}`}>
-                                {detail}
-                              </div>
-                            ))}
+                            {method.details.map((detail, idx) => {
+                              const phone = CONTACT_PHONES.find((item) => item.display === detail);
+                              if (phone && method.title === "Phone Consultation") {
+                                return (
+                                  <a
+                                    key={idx}
+                                    href={`tel:${phone.tel}`}
+                                    className={`block font-semibold ${method.iconColor} hover:underline`}
+                                  >
+                                    {detail}
+                                  </a>
+                                );
+                              }
+
+                              return (
+                                <div key={idx} className={`font-semibold ${method.iconColor}`}>
+                                  {detail}
+                                </div>
+                              );
+                            })}
                           </div>
                           {method.availability && (
                             <div className="text-sm text-muted-foreground mt-2">
@@ -150,7 +166,7 @@ export default function ContactSection() {
                             <Button
                               size="sm"
                               className="mt-2 bg-green-500 hover:bg-green-600"
-                              onClick={() => window.open("https://wa.me/916364467941", "_blank")}
+                              onClick={openWhatsApp}
                             >
                               <MessageSquare className="mr-2 h-4 w-4" />
                               Start Chat
@@ -192,7 +208,7 @@ export default function ContactSection() {
                         <FormItem>
                           <FormLabel>Phone Number *</FormLabel>
                           <FormControl>
-                            <Input placeholder="+91 98765 43210" {...field} />
+                            <Input placeholder={PRIMARY_PHONE.display} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
