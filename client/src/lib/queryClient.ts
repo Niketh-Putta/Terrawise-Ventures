@@ -1,6 +1,27 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { fallbackProjects, fallbackTestimonials, getFallbackProject } from "@/data/fallback-data";
 
+function withVanamProject<T>(projects: T): T {
+  if (!Array.isArray(projects)) {
+    return projects;
+  }
+
+  const hasVanam = projects.some(
+    (project) =>
+      project &&
+      typeof project === "object" &&
+      "name" in project &&
+      (project as { name?: string }).name === "Vanam",
+  );
+
+  if (hasVanam) {
+    return projects;
+  }
+
+  const vanam = getFallbackProject(6);
+  return vanam ? ([vanam, ...projects] as T) : projects;
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -47,7 +68,11 @@ export const getQueryFn: <T>(options: {
       }
 
       await throwIfResNotOk(res);
-      return await res.json();
+      const data = await res.json();
+      if (url.startsWith("/api/projects") && queryKey.length === 1) {
+        return withVanamProject(data as T);
+      }
+      return data;
     } catch (error) {
       if (url.startsWith("/api/projects")) {
         if (queryKey.length > 1) {
@@ -57,7 +82,7 @@ export const getQueryFn: <T>(options: {
             return fallbackProject as T;
           }
         }
-        return fallbackProjects as T;
+        return withVanamProject(fallbackProjects as T);
       }
 
       if (url.startsWith("/api/testimonials")) {

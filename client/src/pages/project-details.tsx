@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { downloadProjectBrochure, projectBrochures } from "@/lib/brochures";
 import { SiteVisitPopup } from "@/components/site-visit-popup";
 
 export default function ProjectDetails() {
@@ -151,7 +152,11 @@ export default function ProjectDetails() {
   });
 
   // Use ALL the actual project images provided by user
-  const projectImages = project?.name === "Naturaleza" ? [
+  const projectImages = project?.name === "Vanam" ? [
+    "/images/vanam-hero.jpg",
+    "/images/vanam-2.jpg",
+    "/images/vanam-3.jpg",
+  ] : project?.name === "Naturaleza" ? [
     "/images/naturaleza-2.jpg", // Gate with Naturaleza sign
     "/images/naturaleza-gate.jpg", // Road with trees
     "/images/naturaleza-3.jpg", // Wide road view
@@ -595,33 +600,20 @@ export default function ProjectDetails() {
                   variant="outline" 
                   className="w-full"
                   onClick={() => {
-                    if (project?.name === "Naturaleza") {
-                      const link = document.createElement('a');
-                      link.href = '/brochures/naturaleza-brochure.pdf';
-                      link.download = 'TRAYEE-Naturaleza-Brochure.pdf';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    } else if (project?.name === "Mirana") {
-                      const link = document.createElement('a');
-                      link.href = '/brochures/mirana-brochure.pdf';
-                      link.download = 'Mirana-Project-Brochure.pdf';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    } else if (project?.name === "TerraGenesis") {
-                      const link = document.createElement('a');
-                      link.href = '/images/avasa-blueprint.jpg';
-                      link.download = 'Avasa-Site-Layout.jpg';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
+                    if (project?.name && !downloadProjectBrochure(project.name)) {
+                      toast({
+                        title: "Brochure unavailable",
+                        description: "Please contact us for project details.",
+                        variant: "destructive",
+                      });
                     }
                   }}
-                  disabled={project?.name !== "Naturaleza" && project?.name !== "Mirana" && project?.name !== "TerraGenesis"}
+                  disabled={!project?.name || !(project.name in projectBrochures)}
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  Download Brochure
+                  {project?.name && projectBrochures[project.name]?.label
+                    ? projectBrochures[project.name].label
+                    : "Download Brochure"}
                 </Button>
               </CardContent>
             </Card>

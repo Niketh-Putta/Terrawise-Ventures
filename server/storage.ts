@@ -516,6 +516,41 @@ export class MemStorage implements IStorage {
   private initializeProjects() {
     const sampleProjects: InsertProject[] = [
       {
+        name: "Vanam",
+        location: "Marasandra, Malur Taluk – Whitefield Growth Corridor, Bengaluru East",
+        price: "₹2,799/sq ft",
+        status: "ongoing",
+        plotsAvailable: 40,
+        plotSize: "Villa plots",
+        description:
+          "More than a plot — a complete lifestyle. Vanam is a 2.5-acre premium plotted development and the initial phase of a 50-acre integrated township. Nestled beside an 800-acre forest with 30 ft CC roads, 45% open spaces, and villa-community amenity access, it offers MPA-approved plots with clear titles and bank loans available along the Whitefield growth corridor near STRR.",
+        imageUrl: "/images/vanam-hero.jpg",
+        amenities: [
+          "30 Ft. CC Roads",
+          "45% Open Spaces",
+          "Gated Security",
+          "Underground Utilities",
+          "Street Lighting",
+          "Rainwater Harvesting",
+          "5,000 Sq. Ft. Clubhouse Access",
+          "Swimming Pool & Kids’ Pool",
+          "Fully Equipped Gym",
+          "Children’s Play Zone",
+        ],
+        features: [
+          "Initial Phase of a 50-Acre Integrated Township",
+          "800-Acre Forest Adjacency",
+          "MPA Approved",
+          "Bank Loans Available",
+          "Clear Titles",
+          "Whitefield Growth Corridor",
+          "Near STRR",
+          "Access to Bengaluru–Chennai Expressway",
+          "Villa-Community Amenity Access",
+          "Premium Brochure Available",
+        ],
+      },
+      {
         name: "Terrawise Gardens",
         location: "Electronic City Phase 2, Bangalore",
         price: "₹52L+",
