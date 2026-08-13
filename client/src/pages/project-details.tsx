@@ -93,10 +93,14 @@ export default function ProjectDetails() {
       try {
         const response = await fetch(`/api/projects/${id}`);
         if (!response.ok) throw new Error("Project not found");
-        return response.json();
+        const project = await response.json();
+        if (project?.name === "TerraGenesis") {
+          throw new Error("Project not found");
+        }
+        return project;
       } catch (error) {
         const fallbackProject = getFallbackProject(Number(id));
-        if (fallbackProject) {
+        if (fallbackProject && fallbackProject.name !== "TerraGenesis") {
           return fallbackProject;
         }
         throw error;
