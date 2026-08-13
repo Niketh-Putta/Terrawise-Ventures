@@ -15,11 +15,6 @@ export const projectBrochures: Record<
     href: "/brochures/mirana-brochure.pdf",
     download: "Mirana-Project-Brochure.pdf",
   },
-  TerraGenesis: {
-    href: "/images/avasa-blueprint.jpg",
-    download: "Avasa-Site-Layout.jpg",
-    label: "Download Site Layout",
-  },
 };
 
 export function downloadProjectBrochure(projectName: string) {

@@ -1,12 +1,25 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { fallbackProjects, fallbackTestimonials, getFallbackProject } from "@/data/fallback-data";
 
-function withVanamProject<T>(projects: T): T {
+const REMOVED_PROJECT_NAMES = new Set(["TerraGenesis"]);
+
+function isRemovedProject(project: unknown): boolean {
+  return Boolean(
+    project &&
+      typeof project === "object" &&
+      "name" in project &&
+      REMOVED_PROJECT_NAMES.has(String((project as { name?: string }).name)),
+  );
+}
+
+function sanitizeProjects<T>(projects: T): T {
   if (!Array.isArray(projects)) {
     return projects;
   }
 
-  const hasVanam = projects.some(
+  const visibleProjects = projects.filter((project) => !isRemovedProject(project));
+
+  const hasVanam = visibleProjects.some(
     (project) =>
       project &&
       typeof project === "object" &&
@@ -15,11 +28,11 @@ function withVanamProject<T>(projects: T): T {
   );
 
   if (hasVanam) {
-    return projects;
+    return visibleProjects as T;
   }
 
   const vanam = getFallbackProject(6);
-  return vanam ? ([vanam, ...projects] as T) : projects;
+  return vanam ? ([vanam, ...visibleProjects] as T) : (visibleProjects as T);
 }
 
 async function throwIfResNotOk(res: Response) {
@@ -70,7 +83,10 @@ export const getQueryFn: <T>(options: {
       await throwIfResNotOk(res);
       const data = await res.json();
       if (url.startsWith("/api/projects") && queryKey.length === 1) {
-        return withVanamProject(data as T);
+        return sanitizeProjects(data as T);
+      }
+      if (url.startsWith("/api/projects") && queryKey.length > 1 && isRemovedProject(data)) {
+        throw new Error("Project not found");
       }
       return data;
     } catch (error) {
@@ -78,11 +94,11 @@ export const getQueryFn: <T>(options: {
         if (queryKey.length > 1) {
           const id = Number(queryKey[1]);
           const fallbackProject = Number.isFinite(id) ? getFallbackProject(id) : undefined;
-          if (fallbackProject) {
+          if (fallbackProject && !isRemovedProject(fallbackProject)) {
             return fallbackProject as T;
           }
         }
-        return withVanamProject(fallbackProjects as T);
+        return sanitizeProjects(fallbackProjects as T);
       }
 
       if (url.startsWith("/api/testimonials")) {
