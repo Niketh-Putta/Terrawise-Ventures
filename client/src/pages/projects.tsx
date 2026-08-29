@@ -14,11 +14,9 @@ import {
   ArrowLeft, 
   Building2, 
   Filter,
-  Search,
-  Download
+  Search
 } from "lucide-react";
 import type { Project } from "@shared/schema";
-import { downloadProjectBrochure } from "@/lib/brochures";
 
 export default function Projects() {
   const [activeFilter, setActiveFilter] = useState("ongoing");
@@ -59,9 +57,6 @@ export default function Projects() {
       return matchesFilter && matchesSearch;
     })
     .sort((a, b) => {
-      if (a.name === "Vanam") return -1;
-      if (b.name === "Vanam") return 1;
-
       switch (sortBy) {
         case "name":
           return a.name.localeCompare(b.name);
@@ -274,23 +269,13 @@ export default function Projects() {
                       )}
                     </div>
 
-                    <div className="flex flex-col gap-3">
+                    <div className="flex gap-3">
                       <Link href={`/projects/${project.id}`} className="flex-1">
                         <Button className="w-full">
                           <Info className="mr-2 h-4 w-4" />
                           View Details
                         </Button>
                       </Link>
-                      {project.name === "Vanam" && (
-                        <Button
-                          variant="outline"
-                          className="w-full border-emerald-700 text-emerald-800 hover:bg-emerald-50"
-                          onClick={() => downloadProjectBrochure("Vanam")}
-                        >
-                          <Download className="mr-2 h-4 w-4" />
-                          Download Brochure
-                        </Button>
-                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -310,13 +295,9 @@ export default function Projects() {
                 <Calendar className="mr-2 h-5 w-5" />
                 Schedule Site Visit
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => downloadProjectBrochure("Vanam")}
-              >
-                <Download className="mr-2 h-5 w-5" />
-                Download VANAM Brochure
+              <Button variant="outline" size="lg">
+                <Building2 className="mr-2 h-5 w-5" />
+                Download Brochures
               </Button>
             </div>
           </div>

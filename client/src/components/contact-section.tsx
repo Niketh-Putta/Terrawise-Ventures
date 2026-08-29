@@ -13,7 +13,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Phone, MapPin, Mail, MessageSquare, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { CONTACT_PHONES, CONTACT_PHONE_DISPLAYS, PRIMARY_PHONE, openWhatsApp } from "@/lib/contact";
 
 export default function ContactSection() {
   const { toast } = useToast();
@@ -70,7 +69,7 @@ export default function ContactSection() {
       icon: Phone,
       title: "Phone Consultation",
       description: "Speak directly with our property experts",
-      details: [...CONTACT_PHONE_DISPLAYS],
+      details: ["+91 98765 43210", "+91 98765 43211"],
       availability: "Available: Mon-Sat, 9 AM - 7 PM",
       bgColor: "bg-primary/10",
       iconColor: "text-primary",
@@ -79,11 +78,7 @@ export default function ContactSection() {
       icon: MapPin,
       title: "Office Visit",
       description: "Visit our experience center",
-      details: [
-        "PropertyPath LTD D.No: F1 & F2, Sarovi #72, 1st Floor",
-        "Sunshine Paradise Layout Kurudusonnenahalli,",
-        "Virgonagar Post Bangalore – 560049",
-      ],
+      details: ["H.No: 200, 2nd floor, 2nd main Belathur", "Sri Nivas Residency"],
       availability: "",
       bgColor: "bg-secondary/10",
       iconColor: "text-secondary",
@@ -101,7 +96,7 @@ export default function ContactSection() {
       icon: MessageSquare,
       title: "WhatsApp Support",
       description: "Quick responses and plot updates",
-      details: [PRIMARY_PHONE.display],
+      details: ["+91 98765 43210"],
       availability: "",
       bgColor: "bg-muted",
       iconColor: "text-muted-foreground",
@@ -136,26 +131,11 @@ export default function ContactSection() {
                           <h4 className="font-bold text-gray-900 mb-2">{method.title}</h4>
                           <p className="text-muted-foreground mb-2">{method.description}</p>
                           <div className="space-y-1">
-                            {method.details.map((detail, idx) => {
-                              const phone = CONTACT_PHONES.find((item) => item.display === detail);
-                              if (phone && method.title === "Phone Consultation") {
-                                return (
-                                  <a
-                                    key={idx}
-                                    href={`tel:${phone.tel}`}
-                                    className={`block font-semibold ${method.iconColor} hover:underline`}
-                                  >
-                                    {detail}
-                                  </a>
-                                );
-                              }
-
-                              return (
-                                <div key={idx} className={`font-semibold ${method.iconColor}`}>
-                                  {detail}
-                                </div>
-                              );
-                            })}
+                            {method.details.map((detail, idx) => (
+                              <div key={idx} className={`font-semibold ${method.iconColor}`}>
+                                {detail}
+                              </div>
+                            ))}
                           </div>
                           {method.availability && (
                             <div className="text-sm text-muted-foreground mt-2">
@@ -163,11 +143,7 @@ export default function ContactSection() {
                             </div>
                           )}
                           {method.title === "WhatsApp Support" && (
-                            <Button
-                              size="sm"
-                              className="mt-2 bg-green-500 hover:bg-green-600"
-                              onClick={openWhatsApp}
-                            >
+                            <Button size="sm" className="mt-2 bg-green-500 hover:bg-green-600">
                               <MessageSquare className="mr-2 h-4 w-4" />
                               Start Chat
                             </Button>
@@ -208,7 +184,7 @@ export default function ContactSection() {
                         <FormItem>
                           <FormLabel>Phone Number *</FormLabel>
                           <FormControl>
-                            <Input placeholder={PRIMARY_PHONE.display} {...field} />
+                            <Input placeholder="+91 98765 43210" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

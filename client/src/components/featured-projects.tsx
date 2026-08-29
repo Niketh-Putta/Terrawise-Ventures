@@ -4,10 +4,9 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Info, Calendar, Heart, Download } from "lucide-react";
+import { MapPin, Info, Calendar, Heart } from "lucide-react";
 import type { Project } from "@shared/schema";
 import { SiteVisitPopup } from "@/components/site-visit-popup";
-import { downloadProjectBrochure } from "@/lib/brochures";
 
 export default function FeaturedProjects() {
   const [activeFilter, setActiveFilter] = useState("ongoing");
@@ -31,16 +30,9 @@ export default function FeaturedProjects() {
     return status;
   };
 
-  const filteredProjects = projects
-    .filter((project) => normalizeStatus(project.status) === activeFilter)
-    .sort((a, b) => {
-      // Keep Vanam first when browsing ongoing projects
-      if (a.name === "Vanam") return -1;
-      if (b.name === "Vanam") return 1;
-      return 0;
-    });
-
-  const vanamProject = projects.find((project) => project.name === "Vanam");
+  const filteredProjects = projects.filter(project =>
+    normalizeStatus(project.status) === activeFilter
+  );
 
   const getStatusBadge = (status: string) => {
     const normalizedStatus = normalizeStatus(status);
@@ -71,53 +63,6 @@ export default function FeaturedProjects() {
             Discover thoughtfully planned communities with world-class infrastructure, amenities, and connectivity.
           </p>
         </div>
-
-        {vanamProject && (
-          <div className="mb-12 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-stone-900 text-white shadow-xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="relative min-h-[380px] lg:min-h-[460px]">
-                <img
-                  src={vanamProject.imageUrl}
-                  alt="Vanam premium plotted development"
-                  className="absolute inset-0 h-full w-full object-cover object-top"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/40 to-transparent lg:hidden" />
-              </div>
-              <div className="flex flex-col justify-center p-8 lg:p-12">
-                <Badge className="mb-4 w-fit border-amber-300/40 bg-amber-400/20 text-amber-100 hover:bg-amber-400/30">
-                  Latest Offering
-                </Badge>
-                <h3 className="text-3xl font-bold tracking-tight mb-2">Vanam</h3>
-                <p className="text-emerald-100/90 mb-2">
-                  2.5-acre premium plotted phase of a 50-acre integrated township
-                </p>
-                <p className="text-sm text-emerald-100/70 mb-6">
-                  {vanamProject.location} · Plots from {vanamProject.price}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    size="lg"
-                    className="bg-amber-400 text-emerald-950 hover:bg-amber-300"
-                    onClick={() => downloadProjectBrochure("Vanam")}
-                  >
-                    <Download className="mr-2 h-5 w-5" />
-                    Download Brochure
-                  </Button>
-                  <Link href={`/projects/${vanamProject.id}`}>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="w-full border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white"
-                    >
-                      <Info className="mr-2 h-5 w-5" />
-                      View Project
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Project Filters */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -193,37 +138,25 @@ export default function FeaturedProjects() {
                     ))}
                   </div>
 
-                  <div className="flex flex-col gap-3">
-                    <div className="flex gap-3">
-                      <Link href={`/projects/${project.id}`} className="flex-1">
-                        <Button className="w-full">
-                          <Info className="mr-2 h-4 w-4" />
-                          View Details
-                        </Button>
-                      </Link>
-                      {project.status !== "upcoming" && (
-                        <Button 
-                          variant="outline" 
-                          className="flex-1"
-                          onClick={() => {
-                            setSelectedProject(project.name);
-                            setShowSiteVisitPopup(true);
-                          }}
-                          data-testid={`button-book-visit-${project.id}`}
-                        >
-                          <Calendar className="mr-2 h-4 w-4" />
-                          Book Visit
-                        </Button>
-                      )}
-                    </div>
-                    {project.name === "Vanam" && (
-                      <Button
-                        variant="outline"
-                        className="w-full border-emerald-700 text-emerald-800 hover:bg-emerald-50"
-                        onClick={() => downloadProjectBrochure("Vanam")}
+                  <div className="flex gap-3">
+                    <Link href={`/projects/${project.id}`} className="flex-1">
+                      <Button className="w-full">
+                        <Info className="mr-2 h-4 w-4" />
+                        View Details
+                      </Button>
+                    </Link>
+                    {project.status !== "upcoming" && (
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => {
+                          setSelectedProject(project.name);
+                          setShowSiteVisitPopup(true);
+                        }}
+                        data-testid={`button-book-visit-${project.id}`}
                       >
-                        <Download className="mr-2 h-4 w-4" />
-                        Download Brochure
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Book Visit
                       </Button>
                     )}
                   </div>

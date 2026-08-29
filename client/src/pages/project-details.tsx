@@ -37,8 +37,6 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { downloadProjectBrochure, projectBrochures } from "@/lib/brochures";
-import { CONTACT_PHONES, PRIMARY_PHONE, openWhatsApp } from "@/lib/contact";
 import { SiteVisitPopup } from "@/components/site-visit-popup";
 
 export default function ProjectDetails() {
@@ -93,14 +91,10 @@ export default function ProjectDetails() {
       try {
         const response = await fetch(`/api/projects/${id}`);
         if (!response.ok) throw new Error("Project not found");
-        const project = await response.json();
-        if (project?.name === "TerraGenesis") {
-          throw new Error("Project not found");
-        }
-        return project;
+        return response.json();
       } catch (error) {
         const fallbackProject = getFallbackProject(Number(id));
-        if (fallbackProject && fallbackProject.name !== "TerraGenesis") {
+        if (fallbackProject) {
           return fallbackProject;
         }
         throw error;
@@ -157,11 +151,7 @@ export default function ProjectDetails() {
   });
 
   // Use ALL the actual project images provided by user
-  const projectImages = project?.name === "Vanam" ? [
-    "/images/vanam-hero.jpg",
-    "/images/vanam-2.jpg",
-    "/images/vanam-3.jpg",
-  ] : project?.name === "Naturaleza" ? [
+  const projectImages = project?.name === "Naturaleza" ? [
     "/images/naturaleza-2.jpg", // Gate with Naturaleza sign
     "/images/naturaleza-gate.jpg", // Road with trees
     "/images/naturaleza-3.jpg", // Wide road view
@@ -593,26 +583,11 @@ export default function ProjectDetails() {
                   <Calendar className="mr-2 h-4 w-4" />
                   Schedule Site Visit
                 </Button>
-                <div className="space-y-2 rounded-md border px-3 py-3">
-                  <div className="flex items-center text-sm font-medium text-gray-900">
-                    <Phone className="mr-2 h-4 w-4" />
-                    Call Now
-                  </div>
-                  {CONTACT_PHONES.map((phone) => (
-                    <a
-                      key={phone.tel}
-                      href={`tel:${phone.tel}`}
-                      className="block text-sm font-semibold text-primary hover:underline"
-                    >
-                      {phone.display}
-                    </a>
-                  ))}
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
-                  onClick={openWhatsApp}
-                >
+                <Button variant="outline" className="w-full">
+                  <Phone className="mr-2 h-4 w-4" />
+                  Call Now: +91 98765 43210
+                </Button>
+                <Button variant="outline" className="w-full bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
                   <MessageSquare className="mr-2 h-4 w-4" />
                   WhatsApp Inquiry
                 </Button>
@@ -620,20 +595,33 @@ export default function ProjectDetails() {
                   variant="outline" 
                   className="w-full"
                   onClick={() => {
-                    if (project?.name && !downloadProjectBrochure(project.name)) {
-                      toast({
-                        title: "Brochure unavailable",
-                        description: "Please contact us for project details.",
-                        variant: "destructive",
-                      });
+                    if (project?.name === "Naturaleza") {
+                      const link = document.createElement('a');
+                      link.href = '/brochures/naturaleza-brochure.pdf';
+                      link.download = 'TRAYEE-Naturaleza-Brochure.pdf';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    } else if (project?.name === "Mirana") {
+                      const link = document.createElement('a');
+                      link.href = '/brochures/mirana-brochure.pdf';
+                      link.download = 'Mirana-Project-Brochure.pdf';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    } else if (project?.name === "TerraGenesis") {
+                      const link = document.createElement('a');
+                      link.href = '/images/avasa-blueprint.jpg';
+                      link.download = 'Avasa-Site-Layout.jpg';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
                     }
                   }}
-                  disabled={!project?.name || !(project.name in projectBrochures)}
+                  disabled={project?.name !== "Naturaleza" && project?.name !== "Mirana" && project?.name !== "TerraGenesis"}
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  {project?.name && projectBrochures[project.name]?.label
-                    ? projectBrochures[project.name].label
-                    : "Download Brochure"}
+                  Download Brochure
                 </Button>
               </CardContent>
             </Card>
@@ -668,7 +656,7 @@ export default function ProjectDetails() {
                           <FormItem>
                             <FormLabel>Phone Number *</FormLabel>
                             <FormControl>
-                              <Input placeholder={PRIMARY_PHONE.display} {...field} />
+                              <Input placeholder="+91 98765 43210" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

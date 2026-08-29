@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Phone, MessageSquare, Calendar, Share2 } from "lucide-react";
-import { callPrimaryPhone, openWhatsApp } from "@/lib/contact";
 
 export default function FloatingActions() {
   const handleShare = async () => {
@@ -40,12 +39,18 @@ export default function FloatingActions() {
     {
       icon: MessageSquare,
       bgColor: "bg-green-500 hover:bg-green-600",
-      action: openWhatsApp,
+      action: () => {
+        // WhatsApp action
+        window.open("https://wa.me/919876543210", "_blank");
+      },
     },
     {
       icon: Phone,
       bgColor: "bg-primary hover:bg-primary/90",
-      action: callPrimaryPhone,
+      action: () => {
+        // Phone action
+        window.location.href = "tel:+919876543210";
+      },
     },
     {
       icon: Calendar,

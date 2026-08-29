@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { X, Calendar, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { PRIMARY_PHONE } from "@/lib/contact";
 
 const bookVisitSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -148,7 +147,7 @@ export function BookVisitPopup({ isOpen, onClose, projectId, projectName }: Book
                     <FormItem>
                       <FormLabel>Phone Number *</FormLabel>
                       <FormControl>
-                        <Input placeholder={PRIMARY_PHONE.display} {...field} />
+                        <Input placeholder="+91 98765 43210" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
