@@ -155,6 +155,9 @@ export default function ProjectDetails() {
     "/images/vanam-hero.jpg",
     "/images/vanam-2.jpg",
     "/images/vanam-3.jpg",
+  ] : project?.name === "Aranya" ? [
+    "/images/aranya-hero.jpg",
+    "/images/aranya-2.jpg",
   ] : project?.name === "Naturaleza" ? [
     "/images/naturaleza-2.jpg", // Gate with Naturaleza sign
     "/images/naturaleza-gate.jpg", // Road with trees
