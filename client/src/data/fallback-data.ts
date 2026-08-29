@@ -19,7 +19,7 @@ export const fallbackProjects: Project[] = [
     name: "Mirana",
     location: "SKH Echium, Aneeta's Marasandra, Marasandra Plantation, Karnataka 560089",
     price: "₹2,499/sq ft",
-    status: "ongoing",
+    status: "completed",
     plotsAvailable: 15,
     plotSize: "30x40, 30x50",
     description: "Premium Villa Plots in a 1-Acre Enclave, Seamlessly Integrated into a Thriving 23-Acre Gated Community with Ready Villas and Vibrant Residency.",
