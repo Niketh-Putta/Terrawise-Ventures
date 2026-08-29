@@ -349,8 +349,12 @@ export default function ProjectDetails() {
                           <h4 className="font-semibold text-gray-900 mb-2">Plot Specifications</h4>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="text-center p-4 bg-muted rounded-lg">
-                              <div className="text-2xl font-bold text-primary">{project.plotsAvailable}</div>
-                              <div className="text-sm text-muted-foreground">Plots Available</div>
+                              <div className="text-2xl font-bold text-primary">
+                                {project.plotsAvailable === 0 ? "Sold Out" : project.plotsAvailable}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {project.plotsAvailable === 0 ? "All Plots" : "Plots Available"}
+                              </div>
                             </div>
                             <div className="text-center p-4 bg-muted rounded-lg">
                               <div className="text-2xl font-bold text-primary">{project.plotSize}</div>
