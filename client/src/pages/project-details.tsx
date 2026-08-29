@@ -237,9 +237,14 @@ export default function ProjectDetails() {
             {/* Project Header */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <Badge variant={statusBadge.variant} className={`mb-2 ${project.status === 'upcoming' ? 'bg-orange-500 text-white' : ''}`}>
-                  {statusBadge.label}
-                </Badge>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant={statusBadge.variant} className={`mb-2 ${project.status === 'upcoming' ? 'bg-orange-500 text-white' : ''}`}>
+                    {statusBadge.label}
+                  </Badge>
+                  {project.plotsAvailable === 0 && (
+                    <Badge className="mb-2 bg-red-600 text-white hover:bg-red-600">Sold Out</Badge>
+                  )}
+                </div>
                 {project.status !== "upcoming" && (
                   <div className="text-right">
                     <div className="text-3xl font-bold text-primary">{project.price}</div>

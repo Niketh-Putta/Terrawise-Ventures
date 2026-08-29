@@ -212,8 +212,11 @@ export default function Projects() {
                       alt={project.name}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-4 left-4">
+                    <div className="absolute top-4 left-4 flex flex-col gap-2">
                       <Badge variant={statusBadge.variant} className={statusBadge.className}>{statusBadge.label}</Badge>
+                      {project.plotsAvailable === 0 && (
+                        <Badge className="bg-red-600 text-white hover:bg-red-600">Sold Out</Badge>
+                      )}
                     </div>
                     <div className="absolute top-4 right-4">
                       <Button variant="ghost" size="sm" className="bg-white/90 backdrop-blur hover:bg-white">
@@ -245,8 +248,12 @@ export default function Projects() {
                     {normalizedStatus !== "upcoming" && (
                       <div className="grid grid-cols-2 gap-4 mb-6">
                         <div className="text-center p-3 bg-muted rounded-lg">
-                          <div className="font-semibold text-gray-900">{project.plotsAvailable}</div>
-                          <div className="text-sm text-muted-foreground">Plots Available</div>
+                          <div className="font-semibold text-gray-900">
+                            {project.plotsAvailable === 0 ? "Sold Out" : project.plotsAvailable}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {project.plotsAvailable === 0 ? "All Plots" : "Plots Available"}
+                          </div>
                         </div>
                         <div className="text-center p-3 bg-muted rounded-lg">
                           <div className="font-semibold text-gray-900">{project.plotSize}</div>
